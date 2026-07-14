@@ -3,6 +3,12 @@ Changelog
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+### Added
+
+ - `aws_sigv4` config options added to `http` components to enable signing requests with AWS Signature Version 4 (e.g. for Amazon Bedrock)
+
 ## 1.19.0 - 2026-07-10
 
 ### Added

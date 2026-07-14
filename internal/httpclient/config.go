@@ -176,6 +176,7 @@ The underlying package that implements the negotiate (SPNEGO) authentication is 
 			Advanced().
 			Version("1.19.0").
 			Optional(),
+		awsSigV4FieldSpec(),
 		service.NewTransportField(hcFieldTransport),
 	)
 
@@ -311,6 +312,9 @@ func ConfigFromParsed(pConf *service.ParsedConfig) (conf OldConfig, err error) {
 	if conf.transport, err = pConf.FieldHTTPTransport(hcFieldTransport); err != nil {
 		return
 	}
+	if conf.awsSigV4, err = awsSigV4FromParsed(pConf); err != nil {
+		return
+	}
 
 	return
 }
@@ -348,6 +352,7 @@ type OldConfig struct {
 	clientCtor          func(context.Context, *http.Client) *http.Client
 	digestAuth          *DigestAuth
 	negotiateAuth       *NegotiateAuth
+	awsSigV4            *awsSigV4Signer
 
 	transport *http.Transport
 }

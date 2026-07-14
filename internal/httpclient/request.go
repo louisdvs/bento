@@ -33,6 +33,7 @@ type RequestCreator struct {
 
 	fs        fs.FS
 	reqSigner func(f fs.FS, req *http.Request) error
+	awsSigner *awsSigV4Signer
 
 	url              *service.InterpolatedString
 	host             *service.InterpolatedString
@@ -52,6 +53,7 @@ func RequestCreatorFromOldConfig(conf OldConfig, mgr *service.Resources, opts ..
 		fs:               mgr.FS(),
 		url:              conf.URL,
 		reqSigner:        conf.authSigner,
+		awsSigner:        conf.awsSigV4,
 		verb:             conf.Verb,
 		headers:          conf.Headers,
 		metaInsertFilter: conf.Metadata,
@@ -254,6 +256,16 @@ func (r *RequestCreator) Create(refBatch service.MessageBatch) (req *http.Reques
 		req.Header.Add("Content-Type", overrideContentType)
 	}
 
-	err = r.reqSigner(r.fs, req)
+	if err = r.reqSigner(r.fs, req); err != nil {
+		return
+	}
+
+	// AWS SigV4 must run last: it signs the request as finally assembled
+	// (body, headers, content-type, host and any other auth headers). Because
+	// retries re-create the request via this method, each attempt is re-signed
+	// with a fresh X-Amz-Date.
+	if r.awsSigner != nil {
+		err = r.awsSigner.Sign(req.Context(), req)
+	}
 	return
 }

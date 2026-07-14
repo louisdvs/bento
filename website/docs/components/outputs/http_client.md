@@ -117,6 +117,14 @@ output:
       kerberos:
         config_file_path: ""
         ccname: ""
+    aws_sigv4:
+      enabled: false
+      region: ""
+      service: ""
+      credentials:
+        id: ""
+        secret: ""
+        token: ""
     transport:
       dial_context:
         timeout: 30s
@@ -846,6 +854,72 @@ Default: `""`
 ### `negotiate.kerberos.ccname`
 
 Setting for the Kerberos cache path. Allowed values would be FILE:/path/to/file for a file or DIR:/path/to/folder for a folder.
+
+
+Type: `string`  
+Default: `""`  
+
+### `aws_sigv4`
+
+Allows you to sign HTTP requests with [AWS Signature Version 4](https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html), which is required by many AWS HTTP APIs such as Amazon Bedrock.
+
+
+Type: `object`  
+Requires version 1.20.0 or newer  
+
+### `aws_sigv4.enabled`
+
+Whether to sign requests with AWS Signature Version 4.
+
+
+Type: `bool`  
+Default: `false`  
+
+### `aws_sigv4.region`
+
+The AWS region to sign requests for. Required when `enabled` is set to `true`.
+
+
+Type: `string`  
+Default: `""`  
+
+### `aws_sigv4.service`
+
+The name of the AWS service to sign requests for, for example `bedrock-runtime` or `execute-api`. Required when `enabled` is set to `true`.
+
+
+Type: `string`  
+Default: `""`  
+
+### `aws_sigv4.credentials`
+
+Optional manual configuration of AWS credentials to use. When omitted the [default credential chain](/docs/guides/cloud/aws) is used (environment variables, shared credentials/config files, IAM roles, etc.).
+
+
+Type: `object`  
+
+### `aws_sigv4.credentials.id`
+
+The ID of credentials to use.
+
+
+Type: `string`  
+Default: `""`  
+
+### `aws_sigv4.credentials.secret`
+
+The secret for the credentials being used.
+:::warning Secret
+This field contains sensitive information that usually shouldn't be added to a config directly, read our [secrets page for more info](/docs/configuration/secrets).
+:::
+
+
+Type: `string`  
+Default: `""`  
+
+### `aws_sigv4.credentials.token`
+
+The token for the credentials being used, required when using short term credentials.
 
 
 Type: `string`  
